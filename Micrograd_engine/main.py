@@ -3,6 +3,12 @@ from visual import draw_dot
 from Neuron import MLP
 
 
+x = [2.0, 3.0, -1.0]
+
+n = MLP(3, [4, 1])
+
+n(x)
+
 xs = [
     [2.0, 3.0, -1.0],
     [3.0, -1.0, 0.5],
@@ -10,12 +16,20 @@ xs = [
     [1.0, 1.0, -1.0],
 ]
 
-n = MLP(4, [4, 4, 1])
+y_target = [1.0, 0.5, 1.0, 0.5]
 
-y_pred = [n(x) for x in xs]
+for k in range(1000):
+    y_pred = [n(x) for x in xs]
 
-y_target = [1.0, 2.0, 3.0, 4.0]
+    loss = sum((y_p-y_t)**2 for y_p, y_t in zip(y_pred, y_target))
 
-loss = sum(((y_p - y_t)**2 for y_p, y_t in zip(y_pred, y_target)))
+    for p in n.parameters():
+        p.grad = 0.0
+    loss.backward()
 
-print(loss)
+    for p in n.parameters():
+        p.data += -0.08*p.grad
+
+    print(k, loss.data)
+
+print(y_pred)

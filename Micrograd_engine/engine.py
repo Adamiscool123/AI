@@ -10,8 +10,11 @@ class Value:
         self.grad = 0.0
         self._backward = lambda : None
 
+    def __repr__(self):
+        return f"Value(data={self.data}, grad={self.grad})"
+
     def __rsub__(self, other):
-        return self-other
+        return other-self
 
     def __sub__(self, other):
         other = other if isinstance(other, Value) else Value(other)
@@ -64,7 +67,7 @@ class Value:
         def _backward():
             self.grad += (other.data * (self.data**(other.data-1)))*out.grad
 
-        out._backward = self._backward
+        out._backward = _backward
 
         return out
 
@@ -95,3 +98,6 @@ class Value:
         out._backward = _backward
 
         return out
+
+    def tanh(self):
+        n = 
