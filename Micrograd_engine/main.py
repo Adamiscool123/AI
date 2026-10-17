@@ -1,4 +1,5 @@
 from engine import Value
+from visual import draw_dot
 
 x1 = Value(3.0)
 x2 = Value(4.0)
@@ -9,4 +10,5 @@ n = x1*w1 + x2*w2
 o = n + b
 p = o.sigmoid()
 p.backward()
-print(f"Data: {n.data}, Grad: {n.grad}")
+dot = draw_dot(p)
+dot.render('graph', view=True, cleanup=True)

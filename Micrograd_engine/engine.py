@@ -2,10 +2,10 @@ import math
 
 class Value:
 
-    def __init__(self, data, _children=(), _opp='', label=''):
+    def __init__(self, data, _children=(), _op='', label=''):
         self.data = data
         self._children = set(_children)
-        self.opperation = _opp
+        self._op = _op
         self.label = label
         self.grad = 0.0
         self._backward = lambda : None
