@@ -25,3 +25,15 @@ class Layer:
         outs = [n(X) for n in self.neurons]
         return outs
 
+#The Mutli_Layer Perceptron
+class MLP:
+    def __init__(self, amount_input, layers):
+        #Connect amount of neurons in input layer + neurons in other layers to a list
+        sz = [amount_input] + layers
+        #Create a layers list where it creates the neurons for each layer
+        #This connects the first input to the 2nd layer then the 2nd input to the third layer and etc...
+        self.layers = [Layer(sz[i], sz[i+1]) for i in range(len(layers))]
+    def __call__(self, X):
+        for layer in self.layers:
+            X = layer(X)
+        return X
