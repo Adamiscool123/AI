@@ -11,7 +11,7 @@ class Value:
         self._backward = lambda : None
     
     def __add__(self, other):
-        other = other if isinstance(other, Value) else other
+        other = other if isinstance(other, Value) else Value(other)
 
         out = Value(self.data + other.data, (self, other), '+')
 
@@ -23,21 +23,8 @@ class Value:
         
         return out
     
-    def __sub__(self, other):
-        other = other if isinstance(other, Value) else other
-
-        out = Value(self.data - other.data, (self, other), '-')
-
-        def _backward():
-            self.grad -= 1*out.grad
-            other.grad -= 1*out.grad
-
-        out._backward = _backward
-        
-        return out
-    
     def __mul__(self, other):
-        other = other if isinstance(other, Value) else other
+        other = other if isinstance(other, Value) else Value(other)
 
         out = Value(self.data * other.data, (self, other), '*')
         
@@ -71,7 +58,7 @@ class Value:
         out = Value(n, (self, ), 'sigmoid')
 
         def _backward():
-            self.grad += (math.exp(-self.data)) / ((1+math.exp(-self.data)**2)) * out.grad
+            self.grad += (math.exp(-self.data)) / ((1+math.exp(-self.data))**2) * out.grad
 
         out._backward = _backward
 

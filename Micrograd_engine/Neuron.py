@@ -5,10 +5,10 @@ from engine import Value
 class Neuron:
     #Initialized weights and bias. Takes in amount of inputs
     def __init__(self, amount_input):
-        #Creates a list of x amount of weights depending on the amount of inputs and creates a random value from -1 to 1 for each weight.
-        self.w = [Value(random.uniform(-1, 1)) for _ in range(amount_input)]
-        #Creates a random bias value from -1 to 1
-        self.b = Value(random.uniform(-1, 1))
+        #Creates a list of x amount of weights depending on the amount of inputs and creates a random value from 0 to 1 for each weight.
+        self.w = [Value(random.uniform(0, 1)) for _ in range(amount_input)]
+        #Creates a random bias value from 0 to 1
+        self.b = Value(random.uniform(0, 1))
     #So I can do x = [2.0, 3.0] n = Neuron(amount_input=2) n(x)
     #It is basically the Neurons body
     def __call__(self, X):
@@ -23,7 +23,8 @@ class Layer:
         self.neurons = [Neuron(amount_input) for _ in range(amount_neurons)]
     def __call__(self, X):
         outs = [n(X) for n in self.neurons]
-        return outs
+        #Just print out the value
+        return outs[0] if len(outs) == 1 else outs
 
 #The Mutli_Layer Perceptron
 class MLP:
