@@ -18,4 +18,10 @@ class Neuron:
         final = output.sigmoid()
         return final
 
-    
+class Layer:
+    def __init__(self, amount_input, amount_neurons):
+        self.neurons = [Neuron(amount_input) for _ in range(amount_neurons)]
+    def __call__(self, X):
+        outs = [n(X) for n in self.neurons]
+        return outs
+
