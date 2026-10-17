@@ -14,8 +14,8 @@ class Neuron:
     def __call__(self, X):
         #We do zip() so we can connect the weights to its corresponding X values.
         output = sum((wi*xi for wi,xi in zip(self.w, X)), self.b) #Equivalent to sum of (wi*xi) + bias 
-        #Pass through a sigmoid function
-        final = output.sigmoid()
+        #Pass through a tanh function
+        final = output.tanh()
         return final
     def parameters(self):
         return self.w + [self.b]

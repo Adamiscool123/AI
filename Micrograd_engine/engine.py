@@ -14,7 +14,7 @@ class Value:
         return f"Value(data={self.data}, grad={self.grad})"
 
     def __rsub__(self, other):
-        return other-self
+        return Value(other)-self
 
     def __sub__(self, other):
         other = other if isinstance(other, Value) else Value(other)
@@ -100,4 +100,12 @@ class Value:
         return out
 
     def tanh(self):
-        n = 
+        n = (math.exp(2*self.data)-1) / (math.exp(2*self.data)+1)
+        out = Value(n, (self, ), 'tanh')
+
+        def _backward():
+            self.grad += (1-(out.data)**2)*out.grad
+
+        out._backward = _backward
+
+        return out
