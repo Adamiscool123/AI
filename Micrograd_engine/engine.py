@@ -106,11 +106,10 @@ class Value:
         return out
 
     def ReLU(self):
-        n = (self.data + abs(self.data)) / 2
-        out = Value(n, (self, ), 'ReLU')
+        out = Value(self.data if self.data > 0 else 0.01 * self.data, (self,), 'LeakyReLU')
 
         def _backward():
-          self.grad += (1.0 if out.data > 0 else 0.0) * out.grad
+          self.grad += (1.0 if out.data > 0 else 0.01) * out.grad
         
         out._backward = _backward
 
