@@ -1,46 +1,32 @@
-import random
 from engine import Value
+import random
 
-#Created a Neuron
 class Neuron:
-    #Initialized weights and bias. Takes in amount of inputs
-    def __init__(self, amount_input):
-        #Creates a list of x amount of weights depending on the amount of inputs and creates a random value from -1 to 1 for each weight.
-        self.w = [Value(random.uniform(-1, 1)) for _ in range(amount_input)]
-        #Creates a random bias value from -1 to 1
-        self.b = Value(random.uniform(-1, 1))
-    #So I can do x = [2.0, 3.0] n = Neuron(amount_input=2) n(x)
-    #It is basically the Neurons body
+    def __init__(self, len_input):
+        self.w = [Value(random.uniform(-0.5, 0.5)) for _ in range(len_input)]
+        self.b = Value(random.uniform(-0.5, 0.5))
     def __call__(self, X):
-        #We do zip() so we can connect the weights to its corresponding X values.
-        output = sum((wi*xi for wi,xi in zip(self.w, X)), self.b) #Equivalent to sum of (wi*xi) + bias 
-        #Pass through a tanh function
-        final = output.tanh()
-        return final
+        out = sum(((w_value * x_value) for w_value, x_value in zip(self.w, X)), self.b)
+        out = out.sigmoid()
+        return out
     def parameters(self):
         return self.w + [self.b]
-
 class Layer:
-    def __init__(self, amount_input, amount_neurons):
-        self.neurons = [Neuron(amount_input) for _ in range(amount_neurons)]
+    def __init__(self, len_input, len_neuron):
+        self.neurons = [Neuron(len_input) for _ in range(len_neuron)]
     def __call__(self, X):
         outs = [n(X) for n in self.neurons]
-        #Just print out the value
         return outs[0] if len(outs) == 1 else outs
     def parameters(self):
-        return [p for neuron in self.neurons for p in neuron.parameters()]
-
-#The Mutli_Layer Perceptron
+        return [p for n in self.neurons for p in n.parameters()]
 class MLP:
-    def __init__(self, amount_input, layers):
-        #Connect amount of neurons in input layer + neurons in other layers to a list
-        sz = [amount_input] + layers
-        #Create a layers list where it creates the neurons for each layer
-        #This connects the first input to the 2nd layer then the 2nd input to the third layer and etc...
-        self.layers = [Layer(sz[i], sz[i+1]) for i in range(len(layers))]
+    def __init__(self, len_input, list_neuron):
+        sz = [len_input] + list_neuron
+        self.layers = [Layer(sz[i], sz[i+1]) for i in range(len(list_neuron))]
     def __call__(self, X):
         for layer in self.layers:
             X = layer(X)
         return X
     def parameters(self):
-        return [p for layer in self.layers for p in layer.parameters()]
+        return [p for n in self.layers for p in n.parameters()]
+        
