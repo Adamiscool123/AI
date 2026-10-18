@@ -9,9 +9,9 @@ class Neuron:
         out = sum(((w_value * x_value) for w_value, x_value in zip(self.w, X)), self.b)
 
         if is_output:
-            out.sigmoid()
+            out = out.sigmoid()
         else:
-            out.tanh()
+            out = out.tanh()
         
         return out
     def parameters(self):

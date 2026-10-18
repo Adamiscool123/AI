@@ -29,7 +29,7 @@ class Value:
         return out
 
     def __rmul__(self, other):
-        return Value(other*self, (other, self), '*')
+        return self*other
     
     def __mul__(self, other):
         other = other if isinstance(other, Value) else Value(other)
@@ -44,7 +44,7 @@ class Value:
         return out
 
     def __rsub__(self, other):
-        return Value(other-self, (other, self), '-')
+        return (self*-1) + other
 
     def __sub__(self, other):
         other = other if isinstance(other, Value) else Value(other)
@@ -96,7 +96,7 @@ class Value:
         for node in reversed(topo):
             node._backward()
     def sigmoid(self):
-        out = Value(1 / (1+math.exp(self.data)), (self, ), 'sigmoid')
+        out = Value(1 / (1+math.exp(-self.data)), (self, ), 'sigmoid')
 
         def _backward():
             self.grad += (out.data*(1-out.data)) * out.grad
