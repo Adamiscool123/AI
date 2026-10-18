@@ -48,11 +48,11 @@ class Value:
 
     def __sub__(self, other):
         other = other if isinstance(other, Value) else Value(other)
-        out = Value(self.data - other.data, (self, other), '-')
+        out = Value(self.data + (other.data * -1), (self, other), '-')
 
         def _backward():
-            self.grad += -1.0*out.grad
-            other.grad += 1.0*out.grad
+            self.grad += 1.0*out.grad
+            other.grad += -1.0*out.grad
 
         out._backward = _backward
 

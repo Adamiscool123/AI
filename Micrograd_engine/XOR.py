@@ -8,7 +8,7 @@ xs = [
     [0.0, 1.0],
     [1.0, 0.0],
 ]
-y_target = [0.0, 0.0, 1.0]
+y_target = [0.0, 0.0, 1.0, 1.0]
 
 for k in range(1000):
     y_pred = [n(x) for x in xs]
