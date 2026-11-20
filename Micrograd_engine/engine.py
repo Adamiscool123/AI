@@ -1,127 +1,117 @@
 import math
-import random
+import numpy as np
 
 class Value:
-    def __init__(self, data, _children=(), _op='', label=''):
-        self.data = data
-        self._prev = set(_children)
-        self._op = _op
-        self.label = label
-        self.grad = 0.0
-        self._backward = lambda : None
-        
-    def __repr__(self):
-        return f"Data:{self.data}, Grad:{self.grad}"
+  def __init__(self, data, _children=(), _op='', label=''):
+    self.data = np.asarray(data, dtype=float)
+    self._prev = set(_children)
+    self.label = label
+    self._op = _op
+    self.grad = np.zeros_like(self.data)
+    self._backward = lambda : None
 
-    def __radd__(self, other):
-        return self+other
-    
-    def __add__(self, other):
-        other = other if isinstance(other, Value) else Value(other)
-        out = Value(self.data + other.data, (self, other), '+')
-        
-        def _backward():
-            self.grad += 1.0*out.grad
-            other.grad += 1.0*out.grad
+  def __repr__(self):
+    return f"Data: {self.data} Grad: {self.grad}"
 
-        out._backward = _backward
-        
-        return out
+  def __radd__(self, other):
+    return self + other
 
-    def __rmul__(self, other):
-        return self*other
-    
-    def __mul__(self, other):
-        other = other if isinstance(other, Value) else Value(other)
-        out = Value(self.data * other.data, (self, other), '*')
+  def __add__(self, other):
+    other = other if isinstance(other, Value) else Value(other)
+    out = Value(self.data + other.data, (self, other), '+')
 
-        def _backward():
-            self.grad += other.data*out.grad
-            other.grad += self.data*out.grad
+    def _backward():
+      self.grad += 1.0 * out.grad
+      other.grad += 1.0 * out.grad
 
-        out._backward = _backward
+    out._backward = _backward
 
-        return out
+    return out
 
-    def __rsub__(self, other):
-        return (self*-1) + other
+  def __rsub__(self, other):
+    return (self*-1)+(other)
 
-    def __sub__(self, other):
-        other = other if isinstance(other, Value) else Value(other)
-        out = Value(self.data + (other.data * -1), (self, other), '-')
+  def __sub__(self, other):
+    other = other if isinstance(other, Value) else Value(other)
+    out = Value(self.data + (other.data*-1.0), (self, other), '-')
 
-        def _backward():
-            self.grad += 1.0*out.grad
-            other.grad += -1.0*out.grad
+    def _backward():
+      self.grad += 1.0 * out.grad
+      other.grad += -1.0 * out.grad
 
-        out._backward = _backward
+    out._backward = _backward
 
-        return out
+    return out
 
-    def __pow__(self, other):
-        other = other if isinstance(other, Value) else Value(other)
-        out = Value(self.data**other.data, (self, other), '**')
+  def __rmul__(self, other):
+    return self * other
 
-        def _backward():
-            self.grad += (other.data * (self.data ** (other.data-1)))*out.grad
+  def __mul__(self, other):
+    other = other if isinstance(other, Value) else Value(other)
+    out = Value(self.data * other.data, (self, other), '*')
 
-        out._backward = _backward
+    def _backward():
+      self.grad += other.data * out.grad
+      other.grad += self.data * out.grad
 
-        return out
+    out._backward = _backward
 
-    def tanh(self):
-        out = Value(math.tanh(self.data), (self, ), 'tanh')
+    return out
 
-        def _backward():
-            self.grad += (1-((out.data)**2))*out.grad
+  def __rpow__(self, other):
+    return (self ** other)
 
-        out._backward = _backward
-        
-        return out
+  def __pow__(self, other):
+    other = other if isinstance(other, Value) else Value(other)
+    out = Value(self.data ** other.data, (self, other), '**')
 
-    def backward(self):
-        topo = []
-        checked = set()
-        def build_topo(v):
-            if v not in checked:
-                checked.add(v)
-                for child in v._prev:
-                    build_topo(child)
-                topo.append(v)
-        
-        build_topo(self)
+    def _backward():
+      self.grad += (other.data * (self.data ** (other.data-1)))*out.grad
 
-        self.grad = 1.0
+    out._backward = _backward
 
-        for node in reversed(topo):
-            node._backward()
-    def sigmoid(self):
-        out = Value(1 / (1+math.exp(-self.data)), (self, ), 'sigmoid')
+    return out
 
-        def _backward():
-            self.grad += (out.data*(1-out.data)) * out.grad
-        
-        out._backward = _backward
-        
-        return out
+  def backward(self):
+    topo = []
+    verified = set()
 
-    def ReLU(self):
-        out = Value(self.data if self.data > 0 else 0.01 * self.data, (self,), 'LeakyReLU')
+    def build_topo(v):
+      if(v not in verified):
+        verified.add(v)
+        for i in v._prev:
+          build_topo(i)
+        topo.append(v)
 
-        def _backward():
-          self.grad += (1.0 if out.data > 0 else 0.01) * out.grad
-        
-        out._backward = _backward
+    build_topo(self)
 
-        return out
+    self.grad = 1.0
 
-    def softmax(logits):
-        n = 
-        out = Value()
+    for k in reversed(topo):
+      k._backward()
 
-        def _backward():
-            return 0
+  def tanh(self):
+    x = max(-50.0, min(50.0, self.data))
+    n1 = (math.exp(x) + math.exp(-1*x))
+    n2 = (math.exp(x) - math.exp(-1*x))
+    tanh = n2/n1
+    out = Value(tanh, (self, ), 'tanh')
 
-        out._backward = _backward
+    def _backward():
+      self.grad += (1 - (tanh)**2)*out.grad
 
-        return out
+    out._backward = _backward
+
+    return out
+
+  def sigmoid(self):
+    x = max(-50.0, min(50.0, self.data))
+    n = (1) / (1 + math.exp(-1*x))
+    out = Value(n, (self, ), 'sigmoid')
+
+    def _backward():
+      self.grad += (n * (1 - n))*out.grad
+
+    out._backward = _backward
+
+    return out
