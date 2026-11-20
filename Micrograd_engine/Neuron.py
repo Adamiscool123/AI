@@ -1,5 +1,6 @@
 import random
 import numpy as np
+from engine import Value
 
 class Neuron:
   def __init__(self, num_input):
