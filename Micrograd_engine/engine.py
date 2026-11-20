@@ -114,3 +114,14 @@ class Value:
         out._backward = _backward
 
         return out
+
+    def softmax(logits):
+        n = 
+        out = Value()
+
+        def _backward():
+            return 0
+
+        out._backward = _backward
+
+        return out
